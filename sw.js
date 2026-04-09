@@ -1,4 +1,3 @@
-// ======================================================================
 // SERVICE WORKER — Chrono PWA
 // ======================================================================
 const CACHE_VERSION = 'chrono-v1';
@@ -42,7 +41,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Intercept icon requests and generate them on-the-fly
   if (url.pathname.endsWith('icon-192.png')) {
     event.respondWith(serveIcon(192));
     return;
@@ -52,23 +50,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for everything else
   event.respondWith(
-    caches.match(event.request).then(cached => {
+    caches.match(event.request).then(async (cached) => {
       if (cached) return cached;
-      return fetch(event.request).then(response => {
+      try {
+        const response = await fetch(event.request);
         // Only cache same-origin successful responses
         if (response.ok && url.origin === self.location.origin) {
           const clone = response.clone();
-          caches.open(CACHE_VERSION).then(cache => cache.put(event.request, clone));
+          const cache = await caches.open(CACHE_VERSION); // FIX: awaited
+          await cache.put(event.request, clone);          // FIX: awaited
         }
         return response;
-      }).catch(() => {
-        // Offline fallback: return the cached index for navigation requests
+      } catch {
+        // Offline fallback for navigation requests
         if (event.request.mode === 'navigate') {
           return caches.match('./index.html');
         }
-      });
+      }
     })
   );
 });
@@ -78,7 +77,6 @@ self.addEventListener('fetch', (event) => {
 // Falls back to inline SVG for older clients.
 // ======================================================================
 async function serveIcon(size) {
-  // Check cache first
   const cache = await caches.open(CACHE_VERSION);
   const cached = await cache.match(`./icon-${size}.png`);
   if (cached) return cached;
@@ -101,8 +99,7 @@ async function serveIcon(size) {
     response = svgIconResponse(size);
   }
 
-  // Store for next time
-  cache.put(`./icon-${size}.png`, response.clone());
+  await cache.put(`./icon-${size}.png`, response.clone()); // FIX: awaited
   return response;
 }
 
@@ -110,18 +107,16 @@ async function renderStopwatchIcon(size) {
   const canvas = new OffscreenCanvas(size, size);
   const ctx = canvas.getContext('2d');
 
-  // ---- Background ----
   ctx.fillStyle = '#050508';
   ctx.fillRect(0, 0, size, size);
 
-  const cx = size * 0.50;
-  const cy = size * 0.54;
-  const r  = size * 0.31;
+  const cx   = size * 0.50;
+  const cy   = size * 0.54;
+  const r    = size * 0.31;
   const cyan = '#00ccff';
 
   ctx.lineCap = 'round';
 
-  // Helper: draw with glow (bloom pass then sharp pass)
   function neonStroke(drawFn, lineWidth) {
     ctx.save();
     ctx.shadowColor = cyan;
@@ -139,13 +134,11 @@ async function renderStopwatchIcon(size) {
     ctx.restore();
   }
 
-  // ---- Outer circle ----
   neonStroke(() => {
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
   }, size * 0.042);
 
-  // ---- Crown (top button) ----
   const crownW = size * 0.12;
   const crownH = size * 0.085;
   neonStroke(() => {
@@ -156,28 +149,24 @@ async function renderStopwatchIcon(size) {
     ctx.lineTo(cx + crownW / 2, cy - r + 1);
   }, size * 0.038);
 
-  // ---- Side lap button ----
   neonStroke(() => {
     ctx.beginPath();
-    ctx.moveTo(cx + r - 1,         cy - r * 0.22);
+    ctx.moveTo(cx + r - 1,            cy - r * 0.22);
     ctx.lineTo(cx + r + size * 0.065, cy - r * 0.22);
   }, size * 0.035);
 
-  // ---- Hour hand ----
   neonStroke(() => {
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx, cy - r * 0.62);
   }, size * 0.032);
 
-  // ---- Minute hand ----
   neonStroke(() => {
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + r * 0.44, cy + r * 0.18);
   }, size * 0.026);
 
-  // ---- Center dot ----
   ctx.save();
   ctx.shadowColor = cyan;
   ctx.shadowBlur  = size * 0.05;
@@ -191,7 +180,7 @@ async function renderStopwatchIcon(size) {
 }
 
 function svgIconResponse(size) {
-  const s = size;
+  const s   = size;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 100 100">
   <rect width="100" height="100" fill="#050508"/>
   <filter id="glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
