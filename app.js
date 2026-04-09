@@ -12,6 +12,8 @@ const colorSwatches   = document.querySelectorAll('.swatch');
 const customColorInput= document.getElementById('custom-color-input');
 const brightnessSlider= document.getElementById('brightness-slider');
 const brightnessLabel = document.getElementById('brightness-label');
+const fontSizeSlider  = document.getElementById('fontsize-slider');
+const fontSizeLabel   = document.getElementById('fontsize-label');
 const btnReset        = document.getElementById('btn-reset');
 const btnClose        = document.getElementById('btn-close');
 const toastEl         = document.getElementById('toast');
@@ -29,6 +31,7 @@ const state = {
   elapsedMs:   0,      // Elapsed ms while paused
   color:       localStorage.getItem('neon-color')  || '#00ffff',
   brightness:  parseInt(localStorage.getItem('brightness') || '100', 10),
+  fontSizeScale: parseInt(localStorage.getItem('fontSizeScale') || '100', 10),
   wakeLock:    null,
   tickTimer:   null,
   // Double-tap reset confirmation
@@ -167,6 +170,19 @@ function applyBrightness(value, persist = true) {
 }
 
 // ======================================================================
+// FONT SIZE SCALE
+// ======================================================================
+function applyFontSize(value, persist = true) {
+  state.fontSizeScale = value;
+  fontSizeLabel.textContent = value;
+  fontSizeSlider.value = value;
+  const scale = value / 100;
+  document.documentElement.style.setProperty('--font-size-scale', scale);
+  syncSliderTrack();
+  if (persist) localStorage.setItem('fontSizeScale', value);
+}
+
+// ======================================================================
 // BACKGROUND IMAGE
 // ======================================================================
 function applyBackgroundImage(blob) {
@@ -205,12 +221,18 @@ function restoreBackgroundImage() {
 }
 
 function syncSliderTrack() {
-  // Drive the slider's colored fill via a CSS custom property
-  const min = parseInt(brightnessSlider.min, 10);
-  const max = parseInt(brightnessSlider.max, 10);
-  const val = parseInt(brightnessSlider.value, 10);
-  const pct = ((val - min) / (max - min)) * 100;
-  brightnessSlider.style.setProperty('--slider-fill', pct + '%');
+  // Drive the sliders' colored fill via a CSS custom property
+  const minB = parseInt(brightnessSlider.min, 10);
+  const maxB = parseInt(brightnessSlider.max, 10);
+  const valB = parseInt(brightnessSlider.value, 10);
+  const pctB = ((valB - minB) / (maxB - minB)) * 100;
+  brightnessSlider.style.setProperty('--slider-fill', pctB + '%');
+  
+  const minF = parseInt(fontSizeSlider.min, 10);
+  const maxF = parseInt(fontSizeSlider.max, 10);
+  const valF = parseInt(fontSizeSlider.value, 10);
+  const pctF = ((valF - minF) / (maxF - minF)) * 100;
+  fontSizeSlider.style.setProperty('--slider-fill', pctF + '%');
 }
 
 // ======================================================================
@@ -247,8 +269,9 @@ function fitStopwatch() {
   const targetW = window.innerWidth  * 0.70;
   const targetH = window.innerHeight * 0.72;
 
-  const scale = Math.min(targetW / probeW, targetH / probeH);
-  timeDisplay.style.fontSize = Math.floor(100 * scale) + 'px';
+  const baseScale = Math.min(targetW / probeW, targetH / probeH);
+  // Store base scale in CSS variable, respecting user's font size scale
+  document.documentElement.style.setProperty('--base-font-scale', baseScale);
 }
 
 // ======================================================================
@@ -373,6 +396,11 @@ function setupEvents() {
     applyBrightness(parseInt(brightnessSlider.value, 10));
   });
 
+  // Font size slider
+  fontSizeSlider.addEventListener('input', () => {
+    applyFontSize(parseInt(fontSizeSlider.value, 10));
+  });
+
   // Reset button inside settings
   btnReset.addEventListener('click', () => {
     resetTimer();
@@ -417,9 +445,11 @@ function init() {
 
   // Restore preferences
   brightnessSlider.value = state.brightness;
+  fontSizeSlider.value = state.fontSizeScale;
   customColorInput.value = state.color;
   applyColor(state.color, false);
   applyBrightness(state.brightness, false);
+  applyFontSize(state.fontSizeScale, false);
 
   // Render initial time
   tick();
