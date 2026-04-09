@@ -60,7 +60,7 @@ html, body {
 }
 
 /* ====================================================================
-   STOPWATCH DISPLAY
+   STOPWATCH DISPLAY (Updated: No neon glow effect)
    ==================================================================== */
 #stopwatch-container {
   display: flex;
