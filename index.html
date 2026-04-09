@@ -19,7 +19,8 @@
   <!-- Main app — brightness filter applied here so modal stays bright -->
   <div id="app">
     <div id="stopwatch-container">
-      <div id="time-display" role="timer" aria-live="off">00:00</div>
+      <!-- FIX: aria-live="polite" + aria-atomic para screen readers -->
+      <div id="time-display" role="timer" aria-live="polite" aria-atomic="true">00:00</div>
     </div>
 
     <div id="floating-buttons">
@@ -64,7 +65,7 @@
       <div class="setting-row">
         <span class="setting-label">Fondo</span>
         <label class="upload-btn" title="Subir imagen de fondo">
-          <input type="file" id="bg-upload" accept="image/*" hidden>
+          <input type="file" id="bg-upload" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
           📸 Subir imagen
         </label>
         <button id="btn-clear-bg" class="action-btn" style="width:100%;margin-top:8px;">✕ Limpiar fondo</button>
