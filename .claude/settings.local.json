@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(wc -l /home/Gandalf/Documents/Chrono/*.html /home/Gandalf/Documents/Chrono/*.css /home/Gandalf/Documents/Chrono/*.js /home/Gandalf/Documents/Chrono/*.json)",
+      "Bash(python3 -c ':*)"
+    ]
+  }
+}
