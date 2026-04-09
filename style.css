@@ -72,20 +72,15 @@ html, body {
 
 #time-display {
   /* Font size calculated dynamically by JS to fill ~70% of the viewport */
-  font-size: 28vw;
-  font-weight: 200;
+  font-size: 32vw;
+  font-weight: 600;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   -webkit-font-smoothing: antialiased;
   color: var(--neon);
-  text-shadow:
-    0 0  8px var(--neon),
-    0 0 20px var(--neon),
-    0 0 50px var(--neon),
-    0 0 90px var(--neon);
-  /* Smooth color / glow transitions */
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  /* Smooth color transition */
+  transition: color 0.4s ease;
   cursor: default;
   /* Custom gesture handling — no browser double-tap zoom */
   touch-action: none;

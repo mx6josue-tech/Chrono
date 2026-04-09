@@ -233,7 +233,7 @@ function fitStopwatch() {
     'top:-9999px',
     'left:-9999px',
     'white-space:nowrap',
-    'font:200 100px -apple-system,"SF Pro Display","Helvetica Neue",Helvetica,sans-serif',
+    'font:600 100px -apple-system,"SF Pro Display","Helvetica Neue",Helvetica,sans-serif',
     'letter-spacing:-0.03em',
     'font-variant-numeric:tabular-nums',
   ].join(';');
