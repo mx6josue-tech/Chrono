@@ -1,6 +1,6 @@
 // SERVICE WORKER — Chrono PWA
 // ======================================================================
-const CACHE_VERSION = 'chrono-v1';
+const CACHE_VERSION = 'chrono-v1.3';
 const STATIC_ASSETS = [
   './',
   './index.html',
