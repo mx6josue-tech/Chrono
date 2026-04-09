@@ -183,6 +183,7 @@ function applyBackgroundImage(blob) {
     showToast('Fondo actualizado ✓');
     haptic([5]);
   };
+  reader.onerror = () => showToast('Error al leer la imagen');
   reader.readAsDataURL(blob);
 }
 
@@ -195,7 +196,12 @@ function clearBackgroundImage() {
 
 function restoreBackgroundImage() {
   const saved = localStorage.getItem('bg-image');
-  if (saved) document.documentElement.style.setProperty('--bg-image', `url(${saved})`);
+  if (saved && /^data:image\/(jpeg|png|webp|gif);base64,/.test(saved)) {
+    document.documentElement.style.setProperty('--bg-image', `url(${saved})`);
+  } else if (saved) {
+    // Dato inválido o corrompido — limpiar silenciosamente
+    localStorage.removeItem('bg-image');
+  }
 }
 
 function syncSliderTrack() {
@@ -422,9 +428,6 @@ function init() {
 
   setupEvents();
   restoreBackgroundImage();
-
-  // Attempt wake lock so screen stays on immediately
-  acquireWakeLock();
 }
 
 document.addEventListener('DOMContentLoaded', init);
