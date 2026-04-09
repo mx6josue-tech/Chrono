@@ -34,6 +34,7 @@ html, body {
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Helvetica, sans-serif;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
+  color-scheme: dark;
 }
 
 /* Prevent 300 ms tap delay everywhere except where we handle gestures */
@@ -223,6 +224,13 @@ html, body {
   flex-shrink: 0;
 }
 
+.swatch:nth-child(1) { background-color: #00ffff; }
+.swatch:nth-child(2) { background-color: #ff00ff; }
+.swatch:nth-child(3) { background-color: #00ff88; }
+.swatch:nth-child(4) { background-color: #ffff00; }
+.swatch:nth-child(5) { background-color: #ff6600; }
+.swatch:nth-child(6) { background-color: #ff0066; }
+
 .swatch:active {
   transform: scale(0.88);
 }
@@ -339,6 +347,11 @@ html, body {
   background: rgba(255, 92, 92, 0.12);
 }
 
+.clear-bg-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
 /* ====================================================================
    TOAST
    ==================================================================== */
@@ -348,8 +361,8 @@ html, body {
   left: 50%;
   transform: translateX(-50%) translateY(14px);
   background: rgba(22, 22, 28, 0.96);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text);
   padding: 11px 22px;
